@@ -2,8 +2,6 @@ package si.primoz.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-
 import java.time.Instant;
 
 @Data
@@ -13,27 +11,52 @@ import java.time.Instant;
 @Table(name = "fo_random")
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class FoRandom {
+public class FoRandom implements Comparable<FoRandom> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_generator")
+    @SequenceGenerator(name = "sequence_generator", sequenceName = "fo_random_seq", allocationSize = 200)
     @EqualsAndHashCode.Include
     @ToString.Include
     private long id;
 
+    @ToString.Include
     @Column(name = "match_id")
     private String matchId;
 
+    @ToString.Include
     @Column(name = "market_id")
     private String marketId;
 
+    @ToString.Include
     @Column(name = "outcome_id")
     private String outcomeId;
 
+    @ToString.Include
     @Column(name = "specifiers")
     private String specifiers;
 
-    @CreatedDate
-    @Column(name = "insert_time")
+    @ToString.Include
+    @Column(name = "insert_time", updatable = false, insertable = false)
     private Instant insert_time;
+
+    public FoRandom(String matchId, String marketId, String outcomeId, String specifiers) {
+        this.matchId = matchId;
+        this.marketId = marketId;
+        this.outcomeId = outcomeId;
+        this.specifiers = specifiers;
+    }
+
+    @Override
+    public int compareTo(FoRandom o) {
+        if(this.matchId.compareTo(o.matchId) != 0) {
+            return this.matchId.compareTo(o.matchId);
+        } else if(this.marketId.compareTo(o.marketId) != 0) {
+            return this.marketId.compareTo(o.marketId);
+        } else if(this.outcomeId.compareTo(o.outcomeId) != 0) {
+            return this.outcomeId.compareTo(o.outcomeId);
+        } else {
+            return this.specifiers.compareTo(o.specifiers);
+        }
+    }
 }
